@@ -26,20 +26,17 @@ namespace Web349.Logging.Slack
                 return;
             }
 
+            long eventId = this.GetEventId();
+
             // create a new log entry with basic data
-            LogEntry logEntry = new(logLevel, this.GetEventId(), this.Context, message, exception);
+            LogEntry logEntry = new(logLevel, eventId, this.Context, message, exception);
 
             // dump enrichments into the log entry
             logEntry.Enrich(dynamicEnrichments);
             logEntry.Enrich(staticEnrichments);
 
-            // enrich DD-specific
-            //logEntry.Enrich("ddsource", this.Source);
-            //logEntry.Enrich("service", this.Service);
-            //logEntry.Enrich("hostname", this.Host);
-
-            // serialize it to json
-            string msg = logEntry.ToString();
+            // need to add enrichments to the message. but how to format properly? I'm not a designer :-)
+            string msg = $"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {message}";
 
             // and off ya go
             dispatcher.Enqueue(msg);

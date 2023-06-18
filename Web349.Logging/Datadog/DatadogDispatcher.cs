@@ -80,13 +80,13 @@ namespace Web349.Logging.Datadog
 
                     if (batch.Count != 0)
                     {
-                        System.Console.WriteLine($"DatadogDispatcher({this.Context}) POST {batch.Count} log entries to {this.intakeUrl}");
+                        System.Console.WriteLine($"DatadogDispatcher({Context}) POST {batch.Count} log entries to {intakeUrl}");
 
-                        HttpResponseMessage res = await this.httpClient.PostAsJsonAsync<List<string>>(this.intakeUrl, batch);
+                        HttpResponseMessage res = await httpClient.PostAsJsonAsync<List<string>>(intakeUrl, batch);
                         if (!res.IsSuccessStatusCode)
                         {
                             System.Console.ForegroundColor = System.ConsoleColor.Red;
-                            System.Console.WriteLine($"DatadogDispatcher({this.Context}) http exception: failed to POST log batch to Datadog intake URL {this.intakeUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
+                            System.Console.WriteLine($"DatadogDispatcher({Context}) http exception: failed to POST log batch to Datadog intake URL {intakeUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
                             System.Console.ForegroundColor = System.ConsoleColor.Gray;
                         }
 
@@ -97,12 +97,12 @@ namespace Web349.Logging.Datadog
                 catch (Exception ex)
                 {
                     System.Console.ForegroundColor = System.ConsoleColor.Red;
-                    System.Console.WriteLine($"DatadogDispatcher({this.Context}) unhandled exception: {ex.Message}");
+                    System.Console.WriteLine($"DatadogDispatcher({Context}) unhandled exception: {ex.Message}");
                     System.Console.ForegroundColor = System.ConsoleColor.Gray;
                 }
                 finally
                 {
-                    await Task.Delay(this.DelayIdle);
+                    await Task.Delay(DelayIdle);
 
                 }
             }

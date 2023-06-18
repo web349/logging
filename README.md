@@ -14,9 +14,10 @@ This .NET Core 6 library contains the logging functionality used throughout Web3
 | |  `WEB349_LOGGING_DATADOG_BATCH_SIZE` | `int` | `10` | The maximum size of a single log event batch. |
 | |  `WEB349_LOGGING_DATADOG_BATCH_AGE` | `int` | `5` | The maximum age, in seconds, of a single log event batch that has not reached its maximum batch size |
 | |  `WEB349_LOGGING_DATADOG_HTTPCLIENT_TIMEOUT` | `int` | `10` | Underlying `HttpClient` timeout in seconds |
-| |  `WEB349_LOGGING_SLACK_HTTPCLIENT_TIMEOUT` | `int` | `10` | Underlying `HttpClient` timeout in seconds |
+| |  `WEB349_LOGGING_SLACK_HTTPCLIENT_TIMEOUT` | `int` | `10` | Underlying `HttpClient` timeout in seconds for calling the registered Webhook URL |
+| |  `WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME>` | `string` |  | A `SlackLogger` needs a name argument in its constructor that should match up with this ENV var |
 | | `WEB349_LOGGING_DISPATCHER_DELAY_IDLE` | `int` | `1000` | The delay, in miliseconds, for the log batch dispatcher to wait in between polls while idling |
-| | `WEB349_LOGGING_DISPATCHER_DELAY_ACTIVE` | `int` | `10` | The delay, in miliseconds, for the log batch dispatcher to wait in between polls while processing log events |
+| | `WEB349_LOGGING_DISPATCHER_DELAY_ACTIVE` | `int` | `100` | The delay, in miliseconds, for the log batch dispatcher to wait in between polls while processing log events |
 
 ## Requirements
 * .NET Core 6 [Download at dot.net](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)

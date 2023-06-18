@@ -21,13 +21,17 @@ namespace Web349.Logging.Slack
         public SlackDispatcher(string context, string webhookUrlName) : base(context)
         {
             webhookUrlName = webhookUrlName.Trim().ToUpper();
+            if (string.IsNullOrEmpty(webhookUrlName))
+            {
+                throw new Exception($"No Slack Webook URL name provided. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME OF THE SLACK LOGGER>.");
+            }
 
             string webhookUrlEnvVar = $"WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName}";
             this.webhookUrl = Environment.GetEnvironmentVariable(webhookUrlName);
 
             if (string.IsNullOrEmpty(this.webhookUrl))
             {
-                throw new Exception("Slack webhook URL is empty. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME> to a valid Slack webhook URL.");
+                throw new Exception($"Slack webhook URL is empty. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName} to contain a valid Slack webhook URL.");
             }
 
             if (!Uri.IsWellFormedUriString(this.webhookUrl, UriKind.Absolute))
@@ -42,7 +46,7 @@ namespace Web349.Logging.Slack
 
         public override void Enqueue(string msg)
         {
-            throw new NotImplementedException();
+            queue.Enqueue(msg);
         }
 
         public override async Task Run()
@@ -55,11 +59,11 @@ namespace Web349.Logging.Slack
                     {
                         SlackMessage message = new(msg);
 
-                        HttpResponseMessage res = await this.httpClient.PostAsJsonAsync<SlackMessage>(this.webhookUrl, message);
+                        HttpResponseMessage res = await httpClient.PostAsJsonAsync<SlackMessage>(webhookUrl, message);
                         if (!res.IsSuccessStatusCode)
                         {
                             System.Console.ForegroundColor = System.ConsoleColor.Red;
-                            System.Console.WriteLine($"SlackDispatcher({this.Context}) http exception: failed to POST log batch to Slack webhook URL {this.webhookUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
+                            System.Console.WriteLine($"SlackDispatcher({Context}) http exception: failed to POST log batch to Slack webhook URL {webhookUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
                             System.Console.ForegroundColor = System.ConsoleColor.Gray;
                         }
 
@@ -69,12 +73,12 @@ namespace Web349.Logging.Slack
                 catch (Exception ex)
                 {
                     System.Console.ForegroundColor = System.ConsoleColor.Red;
-                    System.Console.WriteLine($"SlackDispatcher({this.Context}) unhandled exception: {ex.Message}");
+                    System.Console.WriteLine($"SlackDispatcher({Context}) unhandled exception: {ex.Message}");
                     System.Console.ForegroundColor = System.ConsoleColor.Gray;
                 }
                 finally
                 {
-                    await Task.Delay(this.DelayIdle);
+                    await Task.Delay(DelayIdle);
                 }
             }
         }
