@@ -21,7 +21,7 @@ namespace Web349.Logging.Slack
 
         public SlackDispatcher(string context, string webhookUrlName) : base(context)
         {
-            webhookUrlName = webhookUrlName.Trim().ToUpper();
+            webhookUrlName = webhookUrlName.Trim().Replace("-", "_").ToUpper();
             
             if (string.IsNullOrEmpty(webhookUrlName))
             {
@@ -30,7 +30,7 @@ namespace Web349.Logging.Slack
 
             if (!Regex.IsMatch(webhookUrlName, @"^[a-zA-Z0-9_]+$"))
             {
-                throw new Exception($"Slack webhook URL name contains invalid characters. Only letters A-Z, a-z and underscores are allowed.");
+                throw new Exception($"Slack webhook URL name '{webhookUrlName}' contains invalid characters. Only letters A-Z, a-z and underscores are allowed.");
             }
 
             this.webhookUrl = Environment.GetEnvironmentVariable($"WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName}");

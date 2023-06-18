@@ -1,3 +1,5 @@
+![Nuget](https://img.shields.io/nuget/v/:Web349.Logging)
+
 # Web349 Logging Library
 This .NET Core 6 library contains the logging functionality used throughout Web349's internal and external projects. Contains a powerful Datadog logger.
 
@@ -27,6 +29,7 @@ This .NET Core 6 library contains the logging functionality used throughout Web3
 * Each instance of a `Logger` class creates its own context `logger.Context` for identification purposes.
 * While technically possible, multiple threads should not share the same `Logger` instance.
 * Each `Logger` context keeps track of an `int64` Event ID field.
+* At the moment of writing `SlackLogger` only supports sending of unenriched, text-only messages.
 
 ## Datadog logger usage examples
 
@@ -63,7 +66,9 @@ catch(Exception ex)
 
 ### Logging regular information
 ```
-Logger serviceNameLogger = new SlackLogger("serviceName"); // the Slack webhook URL will match to the value set to WEB349_LOGGING_SLACK_WEBHOOKURL_SERVICENAME
+// the Slack webhook URL will match to the value set to WEB349_LOGGING_SLACK_WEBHOOKURL_SERVICENAME
+// dashes (-) will be replace with an underscore (_) and spaces are removed.
+Logger serviceNameLogger = new SlackLogger("serviceName");
 serviceNameLogger.LogInformation("a message");
 ```
 
