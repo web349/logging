@@ -4,9 +4,9 @@ This .NET Core 6 library contains the logging functionality used throughout Web3
 ## ENV variable configuration
 | Required | Name | Type | Default value | Description |
 | - | - | - | - | - |
-| Yes | `WEB349_LOGGING_DATADOG_APIKEY` | `string` | | Your Datadog API key |
-| Yes | `WEB349_LOGGING_DATADOG_SITE` | `string` | | The Datadog site to send logs to. Must be any of the following values: `US1`, `US3`, `US5`, `EU`, `AP1`, `US1_GOV` |
-| Yes | `WEB349_LOGGING_LOGLEVEL` | `string` | | The log level. Must be any of the following values: `Silent`, `Fatal`, `Error`, `Warning`, `Information`, `Debug`, `Verbose` |
+| &#9989; | `WEB349_LOGGING_DATADOG_APIKEY` | `string` | | Your Datadog API key |
+| &#9989; | `WEB349_LOGGING_DATADOG_SITE` | `string` | | The Datadog site to send logs to. Must be any of the following values: `US1`, `US3`, `US5`, `EU`, `AP1`, `US1_GOV` |
+| &#9989; | `WEB349_LOGGING_LOGLEVEL` | `string` | | The log level. Must be any of the following values: `Silent`, `Fatal`, `Error`, `Warning`, `Information`, `Debug`, `Verbose` |
 |  | `WEB349_LOGGING_DATADOG_SOURCE` | `string` | | Fills the Source field in Datadog |
 | | `WEB349_LOGGING_DATADOG_SERVICE` | `string` | | Fills the Service field in Datadog |
 | | `WEB349_LOGGING_DATADOG_HOST` | `string` | | Fills the Host field in Datadog |
