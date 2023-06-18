@@ -51,10 +51,19 @@ logger
 Logger logger = new DatadogLogger();
 try
 {
-        throw new Exception("oops");
+	throw new Exception("oops");
 }
 catch(Exception ex)
 {
-    logger.LogError(ex.Message, ex);
+	logger.LogError(ex.Message, ex);
 }
 ```
+
+## Slack logger usage examples
+
+### Logging regular information
+```
+Logger serviceNameLogger = new SlackLogger("serviceName"); // the Slack webhook URL will match to the value set to WEB349_LOGGING_SLACK_WEBHOOKURL_SERVICENAME
+serviceNameLogger.LogInformation("a message");
+```
+

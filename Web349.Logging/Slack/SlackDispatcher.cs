@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Web349.Logging.Enums;
 
@@ -21,12 +22,19 @@ namespace Web349.Logging.Slack
         public SlackDispatcher(string context, string webhookUrlName) : base(context)
         {
             webhookUrlName = webhookUrlName.Trim().ToUpper();
+            
             if (string.IsNullOrEmpty(webhookUrlName))
             {
-                throw new Exception($"No Slack Webook URL name provided. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME OF THE SLACK LOGGER>.");
+                throw new Exception($"No Slack webhook URL name provided. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME OF THE SLACK LOGGER>.");
+            }
+
+            if (!Regex.IsMatch(webhookUrlName, @"^[a-zA-Z0-9_]+$"))
+            {
+                throw new Exception($"Slack webhook URL name contains invalid characters. Only letters A-Z, a-z and underscores are allowed.");
             }
 
             this.webhookUrl = Environment.GetEnvironmentVariable($"WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName}");
+            
             if (string.IsNullOrEmpty(this.webhookUrl))
             {
                 throw new Exception($"Slack webhook URL is empty. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName} to contain a valid Slack webhook URL.");
