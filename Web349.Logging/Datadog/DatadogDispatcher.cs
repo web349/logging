@@ -12,20 +12,17 @@ namespace Web349.Logging.Datadog
 {
     public class DatadogDispatcher : Dispatcher
     {
-        private ConcurrentQueue<string> queue = new();
-        private HttpClient httpClient = new();
-        private Task task = null;
-        private string intakeUrl = null;
-        private string apiKey = null;
-        private int batchSize = 10;
-        private int batchAge = 5;
+        private readonly ConcurrentQueue<string> queue = new();
+        private readonly HttpClient httpClient = new();
+        private readonly Task task = null;
+        private readonly string intakeUrl = null;
+        private readonly string apiKey = null;
+        private readonly int batchSize = 10;
+        private readonly int batchAge = 5;
 
         public DatadogDispatcher(string context) : base(context)
         {
-            string site = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SITE");
-            string compressLogs = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_COMPRESSLOGS") ?? "true";
-
-            this.intakeUrl = DatadogSite.GetByString(site);
+            this.intakeUrl = DatadogSite.GetByString(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SITE"));
             if (string.IsNullOrEmpty(this.intakeUrl))
             {
                 throw new Exception("Datadog intake URL is empty. Configure WEB349_LOGGING_DATADOG_SITE to one of the following values: US1, US3, US5, EU, AP1, US1_GOV.");
@@ -45,17 +42,19 @@ namespace Web349.Logging.Datadog
             this.batchSize = Convert.ToInt32(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_BATCH_SIZE") ?? "10");
             this.batchAge = Convert.ToInt32(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_BATCH_AGE") ?? "5");
 
+            this.httpClient.Timeout = TimeSpan.FromSeconds(Convert.ToDouble(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HTTPCLIENT_TIMEOUT") ?? "10"));
+
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json");
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("DD-API-KEY", this.apiKey);
 
+            string compressLogs = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_COMPRESSLOGS") ?? "true";
             if (compressLogs.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Encoding", "gzip");
             }
 
             this.task = Task.Factory.StartNew(Run, TaskCreationOptions.LongRunning);
-            this.httpClient.Timeout = TimeSpan.FromSeconds(Convert.ToDouble(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HTTPCLIENT_TIMEOUT") ?? "30"));
         }
 
         public override void Enqueue(string msg)
@@ -81,27 +80,30 @@ namespace Web349.Logging.Datadog
 
                     if (batch.Count != 0)
                     {
-                        System.Console.WriteLine($"DatadogDispatcher({this.Context}) POST {batch.Count} log entries to {this.intakeUrl}");
+                        System.Console.WriteLine($"DatadogDispatcher({Context}) POST {batch.Count} log entries to {intakeUrl}");
 
-                        HttpResponseMessage res = await this.httpClient.PostAsJsonAsync<List<string>>(this.intakeUrl, batch);
+                        HttpResponseMessage res = await httpClient.PostAsJsonAsync<List<string>>(intakeUrl, batch);
                         if (!res.IsSuccessStatusCode)
                         {
                             System.Console.ForegroundColor = System.ConsoleColor.Red;
-                            System.Console.WriteLine($"DatadogDispatcher({this.Context}) http exception: failed to POST log batch to Datadog intake URL {this.intakeUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
+                            System.Console.WriteLine($"DatadogDispatcher({Context}) http exception: failed to POST log batch to Datadog intake URL {intakeUrl} with status {res.StatusCode} ({res.ReasonPhrase})");
                             System.Console.ForegroundColor = System.ConsoleColor.Gray;
                         }
 
                         batch.Clear();
                         start = DateTimeOffset.UtcNow;
                     }
-
-                    await Task.Delay(this.DelayIdle);
                 }
                 catch (Exception ex)
                 {
                     System.Console.ForegroundColor = System.ConsoleColor.Red;
-                    System.Console.WriteLine($"DatadogDispatcher({this.Context}) unhandled exception: {ex.Message}");
+                    System.Console.WriteLine($"DatadogDispatcher({Context}) unhandled exception: {ex.Message}");
                     System.Console.ForegroundColor = System.ConsoleColor.Gray;
+                }
+                finally
+                {
+                    await Task.Delay(DelayIdle);
+
                 }
             }
         }
@@ -114,13 +116,11 @@ namespace Web349.Logging.Datadog
                 if (task != null)
                 {
                     task.Dispose();
-                    task = null;
                 }
 
                 if (httpClient != null)
                 {
                     httpClient.Dispose();
-                    httpClient = null;
                 }
 
                 disposed = true;
