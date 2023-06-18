@@ -13,19 +13,21 @@ This .NET Core 6 library contains the logging functionality used throughout Web3
 | |  `WEB349_LOGGING_DATADOG_COMPRESSLOGS` | `bool` | `true` | Set to `true` to enable `gzip` compression |
 | |  `WEB349_LOGGING_DATADOG_BATCH_SIZE` | `int` | `10` | The maximum size of a single log event batch. |
 | |  `WEB349_LOGGING_DATADOG_BATCH_AGE` | `int` | `5` | The maximum age, in seconds, of a single log event batch that has not reached its maximum batch size |
+| |  `WEB349_LOGGING_DATADOG_HTTPCLIENT_TIMEOUT` | `int` | `10` | Underlying `HttpClient` timeout in seconds |
+| |  `WEB349_LOGGING_SLACK_HTTPCLIENT_TIMEOUT` | `int` | `10` | Underlying `HttpClient` timeout in seconds |
 | | `WEB349_LOGGING_DISPATCHER_DELAY_IDLE` | `int` | `1000` | The delay, in miliseconds, for the log batch dispatcher to wait in between polls while idling |
 | | `WEB349_LOGGING_DISPATCHER_DELAY_ACTIVE` | `int` | `10` | The delay, in miliseconds, for the log batch dispatcher to wait in between polls while processing log events |
 
 ## Requirements
-* .NET Core 6
-* System.Text.Json for JSON serialization
+* .NET Core 6 [Download at dot.net](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+* `System.Text.Json` for JSON serialization
 
 ## Notes
 * Each instance of a `Logger` class creates its own context `logger.Context` for identification purposes.
 * While technically possible, multiple threads should not share the same `Logger` instance.
 * Each `Logger` context keeps track of an `int64` Event ID field.
 
-## Usage examples
+## Datadog logger usage examples
 
 ### Logging regular information
 ```
