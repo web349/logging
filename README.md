@@ -1,4 +1,4 @@
-![Nuget](https://img.shields.io/nuget/v/:Web349.Logging)
+[![Nuget](https://img.shields.io/nuget/v/:Web349.Logging)](https://img.shields.io/nuget/vpre/Web349.Logging)
 
 # Web349 Logging Library
 This .NET Core 6 library contains the logging functionality used throughout Web349's internal and external projects. Contains a powerful Datadog logger.
