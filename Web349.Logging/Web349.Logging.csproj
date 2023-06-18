@@ -4,22 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <Title>Web349 Datadog logger</Title>
-    <Description>Logging framework used by Web349. Includes powerful Datadog logger.</Description>
+    <Title>Web349 Datadog and Slack Logger</Title>
+    <Description>Logging framework used by Web349. Includes powerful Datadog and Slack logger.</Description>
     <PackageProjectUrl>https://github.com/web349/logging</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/web349/logging</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>logging;datadog</PackageTags>
-    <AssemblyVersion>0.1</AssemblyVersion>
-    <FileVersion>0.1</FileVersion>
+    <PackageTags>logging;datadog;slack</PackageTags>
+    <AssemblyVersion>0.1.1</AssemblyVersion>
+    <FileVersion>0.1.1</FileVersion>
+	  <Version>0.1.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

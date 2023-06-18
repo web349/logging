@@ -26,9 +26,7 @@ namespace Web349.Logging.Slack
                 throw new Exception($"No Slack Webook URL name provided. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_<NAME OF THE SLACK LOGGER>.");
             }
 
-            string webhookUrlEnvVar = $"WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName}";
-            this.webhookUrl = Environment.GetEnvironmentVariable(webhookUrlName);
-
+            this.webhookUrl = Environment.GetEnvironmentVariable($"WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName}");
             if (string.IsNullOrEmpty(this.webhookUrl))
             {
                 throw new Exception($"Slack webhook URL is empty. Configure WEB349_LOGGING_SLACK_WEBHOOKURL_{webhookUrlName} to contain a valid Slack webhook URL.");
@@ -36,7 +34,7 @@ namespace Web349.Logging.Slack
 
             if (!Uri.IsWellFormedUriString(this.webhookUrl, UriKind.Absolute))
             {
-                throw new Exception($"Datadog intake URL is malformed: {this.webhookUrl}");
+                throw new Exception($"Slack webhook URL is malformed: {this.webhookUrl}");
             }
 
             this.httpClient.Timeout = TimeSpan.FromSeconds(Convert.ToDouble(Environment.GetEnvironmentVariable("WEB349_LOGGING_SLACK_HTTPCLIENT_TIMEOUT") ?? "10"));
