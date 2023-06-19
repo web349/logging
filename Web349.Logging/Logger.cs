@@ -10,30 +10,42 @@ namespace Web349.Logging
 {
     public abstract class Logger
     {
+        private string[] censorshipKeywords;
+
         private long eventId = 0;
-        protected Dictionary<string, object> dynamicEnrichments = new();
-        protected Dictionary<string, object> staticEnrichments = new();
+        protected readonly Dictionary<string, object> dynamicEnrichments = new();
+        protected readonly Dictionary<string, object> staticEnrichments = new();
         protected Dispatcher dispatcher = null;
 
         public LogLevel LogLevel { get; set; } = LogLevel.Verbose;
         public string Context { get; private set; }
 
-        public Logger()
+        public bool IsCensorshipEnabled { get; set; }
+
+        protected Logger(string context)
         {
-            this.Context = Guid.NewGuid().ToString().ToLower();
+            this.Context = context?.ToLower()?.Trim() ?? Guid.NewGuid().ToString().ToLower();
             if (!Enum.TryParse<LogLevel>(Environment.GetEnvironmentVariable("WEB349_LOGGING_LOGLEVEL"), true, out LogLevel level))
             {
                 throw new Exception($"Unable to determine default log level. Please configure WEB349_LOGGING_LOGLEVEL to be one of following values: Silent, Fatal, Error, Warning, Information, Debug, Verbose");
             }
-        }
+            this.LogLevel = level;
+            this.IsCensorshipEnabled = Convert.ToBoolean(Environment.GetEnvironmentVariable("WEB349_LOGGING_CENSORSHIP_ENABLED") ?? "true");
 
-        public Logger(string context)
-        {
-            this.Context = context.ToLower().Trim();
+            string censorshipKeywordsEnv = Environment.GetEnvironmentVariable("WEB349_LOGGING_CENSORSHIP_KEYWORDS") ?? "api;key;secret;credential;auth;cookie;login";
+            if (!string.IsNullOrEmpty(censorshipKeywordsEnv))
+            {
+                this.censorshipKeywords = censorshipKeywordsEnv.Trim().ToLower().Split(';');
+            }
         }
 
         public Logger Enrich(string name, object value, bool isStatic = false)
         {
+            if (IsCensorshipEnabled && IsSensitiveInformation(name))
+            {
+                value = "***";
+            }
+
             if (!isStatic)
             {
                 dynamicEnrichments.TryAdd(name, value);
@@ -56,44 +68,44 @@ namespace Web349.Logging
             staticEnrichments.Clear();
         }
 
-        public void LogFatal(string message)
+        public string LogFatal(string message)
         {
-            WriteLine(message, LogLevel.Fatal);
+            return WriteLine(message, LogLevel.Fatal);
         }
 
-        public void LogFatal(string message, Exception exception)
+        public string LogFatal(string message, Exception exception)
         {
-            WriteLine(message, LogLevel.Fatal, exception);
+            return WriteLine(message, LogLevel.Fatal, exception);
         }
 
-        public void LogError(string message)
+        public string LogError(string message)
         {
-            WriteLine(message, LogLevel.Error);
+            return WriteLine(message, LogLevel.Error);
         }
 
-        public void LogError(string message, Exception exception)
+        public string LogError(string message, Exception exception)
         {
-            WriteLine(message, LogLevel.Error, exception);
+            return WriteLine(message, LogLevel.Error, exception);
         }
 
-        public void LogWarning(string message)
+        public string LogWarning(string message)
         {
-            WriteLine(message, LogLevel.Warning);
+            return WriteLine(message, LogLevel.Warning);
         }
 
-        public void LogInformation(string message)
+        public string LogInformation(string message)
         {
-            WriteLine(message, LogLevel.Information);
+            return WriteLine(message, LogLevel.Information);
         }
 
-        public void LogDebug(string message)
+        public string LogDebug(string message)
         {
-            WriteLine(message, LogLevel.Debug);
+            return WriteLine(message, LogLevel.Debug);
         }
 
-        public void LogVerbose(string message)
+        public string LogVerbose(string message)
         {
-            WriteLine(message, LogLevel.Verbose);
+            return WriteLine(message, LogLevel.Verbose);
         }
 
         protected long GetEventId()
@@ -101,6 +113,14 @@ namespace Web349.Logging
             return Interlocked.Increment(ref eventId);
         }
 
-        protected abstract void WriteLine(string message, LogLevel logLevel, Exception exception = null);
+        protected bool IsSensitiveInformation(string name)
+        {
+            // try to determine if the supplied name/key could possibly contain sensitive information, such as api keys or credentials
+            string lname = name.ToLower().Trim();
+            bool hasKeyword = censorshipKeywords.Where(x => lname.Contains(x, StringComparison.OrdinalIgnoreCase)).Count() != 0;
+            return hasKeyword;
+        }
+
+        protected abstract string WriteLine(string message, LogLevel logLevel, Exception exception = null);
     }
 }

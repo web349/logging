@@ -48,8 +48,8 @@ namespace Web349.Logging.Datadog
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
             this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("DD-API-KEY", this.apiKey);
 
-            string compressLogs = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_COMPRESSLOGS") ?? "true";
-            if (compressLogs.Equals("true", StringComparison.OrdinalIgnoreCase))
+            bool compressLogs = Convert.ToBoolean(Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_COMPRESSLOGS") ?? "true");
+            if (compressLogs)
             {
                 this.httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Encoding", "gzip");
             }
@@ -103,7 +103,6 @@ namespace Web349.Logging.Datadog
                 finally
                 {
                     await Task.Delay(DelayIdle);
-
                 }
             }
         }

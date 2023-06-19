@@ -13,12 +13,8 @@ namespace Web349.Logging.Datadog
         public string Service { get; set; }
         public string Host { get; set; }
 
-        public DatadogLogger() : base()
+        public DatadogLogger() : this(null)
         {
-            this.dispatcher = new DatadogDispatcher(this.Context);
-            this.Source = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SOURCE") ?? this.Context;
-            this.Service = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SERVICE");
-            this.Host = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HOST");
         }
 
         public DatadogLogger(string context) : base(context)
@@ -29,11 +25,11 @@ namespace Web349.Logging.Datadog
             this.Host = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HOST");
         }
 
-        protected override void WriteLine(string message, LogLevel logLevel, Exception exception = null)
+        protected override string WriteLine(string message, LogLevel logLevel, Exception exception = null)
         {
             if (this.LogLevel < logLevel)
             {
-                return;
+                return null;
             }
 
             // create a new log entry with basic data
@@ -56,6 +52,8 @@ namespace Web349.Logging.Datadog
 
             // clear dynamic enrichments, resetting state for the next log event
             ClearDynamicEnrichments();
+
+            return msg;
         }
     }
 }
