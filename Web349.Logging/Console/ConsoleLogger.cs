@@ -17,7 +17,7 @@ namespace Web349.Logging.Console
         {
         }
 
-        protected override void WriteLine(string message, LogLevel logLevel, Exception exception = null)
+        protected override string WriteLine(string message, LogLevel logLevel, Exception exception = null)
         {
             switch (logLevel)
             {
@@ -45,20 +45,28 @@ namespace Web349.Logging.Console
             }
 
             long eventId = this.GetEventId();
-
-            System.Console.WriteLine($"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {message}");
+            string msg = $"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {message}";
+            
+            System.Console.WriteLine(msg);
 
             if (exception != null)
             {
-                System.Console.WriteLine($"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {exception.Message}");
+                string exceptionMsg = $"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {exception.Message}";
+                msg += $"\n{exceptionMsg}";
+
+                System.Console.WriteLine(exceptionMsg);
 
                 if (exception.InnerException != null)
                 {
-                    System.Console.WriteLine($"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {exception.InnerException.Message}");
+                    string innerExceptionMsg = $"[{logLevel.ToString().ToUpper()}] [{eventId}] [{DateTimeOffset.UtcNow.ToString("yyyy/MM/dd HH:mm:ss.fff")}] - {exception.InnerException.Message}";
+                    msg += $"\n{innerExceptionMsg}";
+                    System.Console.WriteLine(innerExceptionMsg);
                 }
             }
 
             System.Console.ForegroundColor = ConsoleColor.Gray;
+
+            return msg;
         }
     }
 }

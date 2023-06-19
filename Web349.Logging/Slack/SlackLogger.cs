@@ -19,11 +19,11 @@ namespace Web349.Logging.Slack
             this.dispatcher = new SlackDispatcher(this.Context, name);
         }
 
-        protected override void WriteLine(string message, LogLevel logLevel, Exception exception = null)
+        protected override string WriteLine(string message, LogLevel logLevel, Exception exception = null)
         {
             if (this.LogLevel < logLevel)
             {
-                return;
+                return null;
             }
 
             long eventId = this.GetEventId();
@@ -43,6 +43,8 @@ namespace Web349.Logging.Slack
 
             // clear dynamic enrichments, resetting state for the next log event
             ClearDynamicEnrichments();
+
+            return msg;
         }
     }
 }

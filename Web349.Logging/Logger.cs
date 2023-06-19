@@ -10,7 +10,7 @@ namespace Web349.Logging
 {
     public abstract class Logger
     {
-        private readonly string[] censorshipKeywords;
+        private string[] censorshipKeywords;
 
         private long eventId = 0;
         protected readonly Dictionary<string, object> dynamicEnrichments = new();
@@ -22,25 +22,25 @@ namespace Web349.Logging
 
         public bool IsCensorshipEnabled { get; set; }
 
-        public Logger()
+        public Logger() : this(null)
         {
-            this.Context = Guid.NewGuid().ToString().ToLower();
+        }
+
+        public Logger(string context)
+        {
+            this.Context = context?.ToLower()?.Trim() ?? Guid.NewGuid().ToString().ToLower();
             if (!Enum.TryParse<LogLevel>(Environment.GetEnvironmentVariable("WEB349_LOGGING_LOGLEVEL"), true, out LogLevel level))
             {
                 throw new Exception($"Unable to determine default log level. Please configure WEB349_LOGGING_LOGLEVEL to be one of following values: Silent, Fatal, Error, Warning, Information, Debug, Verbose");
             }
+            this.LogLevel = level;
             this.IsCensorshipEnabled = Convert.ToBoolean(Environment.GetEnvironmentVariable("WEB349_LOGGING_CENSORSHIP_ENABLED") ?? "true");
-         
+
             string censorshipKeywordsEnv = Environment.GetEnvironmentVariable("WEB349_LOGGING_CENSORSHIP_KEYWORDS") ?? "api;key;secret;credential;auth;cookie;login";
             if (!string.IsNullOrEmpty(censorshipKeywordsEnv))
             {
                 this.censorshipKeywords = censorshipKeywordsEnv.Trim().ToLower().Split(';');
             }
-        }
-
-        public Logger(string context)
-        {
-            this.Context = context.ToLower().Trim();
         }
 
         public Logger Enrich(string name, object value, bool isStatic = false)
@@ -121,7 +121,8 @@ namespace Web349.Logging
         {
             // try to determine if the supplied name/key could possibly contain sensitive information, such as api keys or credentials
             string lname = name.ToLower().Trim();
-            return censorshipKeywords.Contains(lname);
+            bool hasKeyword = censorshipKeywords.Where(x => lname.Contains(x, StringComparison.OrdinalIgnoreCase)).Count() != 0;
+            return hasKeyword;
         }
 
         protected abstract string WriteLine(string message, LogLevel logLevel, Exception exception = null);

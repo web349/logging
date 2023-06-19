@@ -29,11 +29,11 @@ namespace Web349.Logging.Datadog
             this.Host = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HOST");
         }
 
-        protected override void WriteLine(string message, LogLevel logLevel, Exception exception = null)
+        protected override string WriteLine(string message, LogLevel logLevel, Exception exception = null)
         {
             if (this.LogLevel < logLevel)
             {
-                return;
+                return null;
             }
 
             // create a new log entry with basic data
@@ -56,6 +56,8 @@ namespace Web349.Logging.Datadog
 
             // clear dynamic enrichments, resetting state for the next log event
             ClearDynamicEnrichments();
+
+            return msg;
         }
     }
 }
