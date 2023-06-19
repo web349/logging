@@ -9,7 +9,7 @@ namespace Web349.Logging.Console
 {
     public class ConsoleLogger : Logger
     {
-        public ConsoleLogger()
+        public ConsoleLogger() : this(null)
         {
         }
 

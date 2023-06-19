@@ -13,12 +13,8 @@ namespace Web349.Logging.Datadog
         public string Service { get; set; }
         public string Host { get; set; }
 
-        public DatadogLogger() : base()
+        public DatadogLogger() : this(null)
         {
-            this.dispatcher = new DatadogDispatcher(this.Context);
-            this.Source = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SOURCE") ?? this.Context;
-            this.Service = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_SERVICE");
-            this.Host = Environment.GetEnvironmentVariable("WEB349_LOGGING_DATADOG_HOST");
         }
 
         public DatadogLogger(string context) : base(context)

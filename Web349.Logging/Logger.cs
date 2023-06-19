@@ -22,11 +22,7 @@ namespace Web349.Logging
 
         public bool IsCensorshipEnabled { get; set; }
 
-        public Logger() : this(null)
-        {
-        }
-
-        public Logger(string context)
+        protected Logger(string context)
         {
             this.Context = context?.ToLower()?.Trim() ?? Guid.NewGuid().ToString().ToLower();
             if (!Enum.TryParse<LogLevel>(Environment.GetEnvironmentVariable("WEB349_LOGGING_LOGLEVEL"), true, out LogLevel level))

@@ -28,10 +28,10 @@ This .NET Core 6 library contains the logging functionality used throughout Web3
 * `System.Text.Json` for JSON serialization
 
 ## Notes
-* Each instance of a `Logger` class creates its own context `logger.Context` for identification purposes.
+* Each instance of a `Logger` class creates its own context `logger.Context` for identification purposes. If not specified during `Logger` implementation creation, the `Context` is a new `GUID`.
 * While technically possible, multiple threads should not share the same `Logger` instance.
-* Each `Logger` context keeps track of an `int64` Event ID field.
-* At the moment of writing `SlackLogger` only supports sending of unenriched, text-only messages.
+* Each `Logger` context keeps track of an `int64` Event ID field allowing for easier identification and log tracing.
+* At the moment of writing `SlackLogger` only supports sending of unenriched, text-only messages. Use Markdown to apply formatting in Slack.
 * The `SlackLogger` name has the follow regular expression limitation: `^[a-zA-Z0-9_]+$`.
 * The Dispatcher settings only apply to `Logger` implementations that use a producer/consumer dispatching service to send off the logs (e.g., `SlackLogger` and `DatadogLogger`).
 

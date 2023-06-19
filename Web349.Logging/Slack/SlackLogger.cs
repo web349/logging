@@ -9,12 +9,11 @@ namespace Web349.Logging.Slack
 {
     public class SlackLogger : Logger
     {
-        public SlackLogger(string name)
+        public SlackLogger(string name) : this(name, null)
         {
-            this.dispatcher = new SlackDispatcher(this.Context, name);
         }
 
-        public SlackLogger(string context, string name) : base(context)
+        public SlackLogger(string name, string context) : base(context)
         {
             this.dispatcher = new SlackDispatcher(this.Context, name);
         }
